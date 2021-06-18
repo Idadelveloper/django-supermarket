@@ -2,7 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.utils import timezone
 from django.views.generic import ListView, DetailView, View
-from .models import Item, OrderItem, Order
+from .models import Item, OrderItem, Order, Address
+from .forms import AddressForm
 
 # Create your views here.
 
@@ -25,10 +26,53 @@ class OrderSummaryView(View):
         return render(self.request, 'order_summary.html', context)
 
 
+class CheckoutView(View):
+    def get(self, *args, **kwargs):
+        # address = Address.objects.get(user=self.request.user, default=True)
+        form = AddressForm()
+        context = {
+            'form': form,
+            # 'address': address
+        }
+        return render(self.request, 'checkout.html', context)
 
-def checkout(request):
-    return render(request, 'checkout.html')
+    def post(self, *args, **kwargs):
+        order = Order.objects.get(user=self.request.user, ordered=False)
+        form = AddressForm(self.request.POST or None)
+        if form.is_valid():
+            street_address = form.cleaned_data.get('street_address')
+            apartment_address = form.cleaned_data.get('apartment_address')
+            country = form.cleaned_data.get('country')
+            zip = form.cleaned_data.get('zip')
+            save_info = form.cleaned_data.get('save_info')
+            use_default = form.cleaned_data.get('use_default')
+            payment_option = form.cleaned_data.get('payment_option')
 
+            address = Address(
+                user=self.request.user,
+                street_address=street_address,
+                apartment_address=apartment_address,
+                country=country,
+                zip=zip
+            )
+            address.save()
+            if save_info:
+                address.default = True
+                address.save()
+            order.address = address
+            order.save()
+            
+            if use_default:
+                address = Address.objects.get(user=self.request.user, default=True)
+                order.address = address
+                order.save()
+
+            print(form.cleaned_data)
+            return redirect('checkout')
+        else:
+            print('form invalid')
+            return redirect('checkout')
+    
 
 def add_to_cart(request, slug):
     item = get_object_or_404(Item, slug=slug)

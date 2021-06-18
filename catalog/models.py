@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
+from django_countries.fields import CountryField
 
 
 CATEGORY_CHOICES = (
@@ -12,6 +13,10 @@ LABEL_CHOICES = (
     ('S', 'secondary'),
     ('P', 'primary'),
     ('D', 'danger')
+)
+PAYMENT_CHOICES = (
+    ('S', 'Stripe'),
+    ('P', 'Paypal')
 )
 
 # Create your models here.
@@ -67,6 +72,7 @@ class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     items = models.ManyToManyField(OrderItem)
     ordered = models.BooleanField(default=False)
+    address = models.ForeignKey("Address", on_delete=models.SET_NULL, blank=True, null=True)
     start_date = models.DateTimeField(auto_now_add=True)
     ordered_date = models.DateTimeField()
 
@@ -79,3 +85,20 @@ class Order(models.Model):
         for order_item in self.items.all():
             total += order_item.get_final_price()
         return total
+
+    
+class Address(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    street_address = models.CharField(max_length=200)
+    apartment_address = models.CharField(max_length=200)
+    country = CountryField(multiple=False)
+    zip = models.CharField(max_length=200)
+    save_info = models.BooleanField(default=False)
+    default = models.BooleanField(default=False)
+    use_default = models.BooleanField(default=False)
+    payment_option = models.CharField(choices=PAYMENT_CHOICES, max_length=2)
+    class Meta:
+        verbose_name_plural = "Addresses"
+
+    def __str__(self):
+        return self.user.username
