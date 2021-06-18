@@ -69,39 +69,53 @@
 
             <!-- Left -->
             <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
+            <li class="nav-item">
                 <a class="nav-link waves-effect" href="{% url 'home' %}">Home
+                <span class="sr-only">(current)</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link waves-effect" href="{% url 'product' '<slug>' %}">Products
+                <span class="sr-only">(current)</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link waves-effect" href="{% url 'checkout' %}">Checkout
                 <span class="sr-only">(current)</span>
                 </a>
             </li>
             
             </ul>
 
-            <!-- Right -->
-            <ul class="navbar-nav nav-flex-icons">
-            <li class="nav-item">
-                <a href="{% url 'order_summary' %}" class="nav-link waves-effect">
-                <span class="badge red z-depth-1 mr-1"> {{ request.user|cart_item_count }} </span>
-                <i class="fas fa-shopping-cart"></i>
-                <span class="clearfix d-none d-sm-inline-block"> Cart </span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="https://www.facebook.com/mdbootstrap" class="nav-link waves-effect" target="_blank">
-                <i class="fab fa-facebook-f"></i>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="https://twitter.com/MDBootstrap" class="nav-link waves-effect" target="_blank">
-                <i class="fab fa-twitter"></i>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="https://github.com/mdbootstrap/bootstrap-material-design" class="nav-link border border-light rounded waves-effect"
-                target="_blank">
-                <i class="fab fa-github mr-2"></i>MDB GitHub
-                </a>
-            </li>
+            {% if request.user.is_auhenticated %}
+            
+                <!-- Right -->
+                <ul class="navbar-nav nav-flex-icons">
+                <li class="nav-item">
+                    <a href="{% url 'order_summary' %}" class="nav-link waves-effect">
+                    <span class="badge red z-depth-1 mr-1"> {{ request.user|cart_item_count }} </span>
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="clearfix d-none d-sm-inline-block"> Cart </span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link waves-effect" href="{% url 'account_logout' %}">Logout
+                    <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link waves-effect" href="{% url 'account_login' %}">Login
+                    <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link waves-effect" href="{% url 'account_signup' %}">SignUp
+                    <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+            {% endif %}
+            
             </ul>
 
         </div>
@@ -135,7 +149,7 @@
     <footer class="page-footer text-center font-small mt-4 wow fadeIn">
 
         <!--Call to action-->
-        <div class="pt-4">
+        {% comment %} <div class="pt-4">
         <a class="btn btn-outline-white" href="https://mdbootstrap.com/docs/jquery/getting-started/download/" target="_blank"
             role="button">Download MDB
             <i class="fas fa-download ml-2"></i>
@@ -144,7 +158,7 @@
             free tutorial
             <i class="fas fa-graduation-cap ml-2"></i>
         </a>
-        </div>
+        </div> {% endcomment %}
         <!--/.Call to action-->
 
         <hr class="my-4">
@@ -187,8 +201,8 @@
 
         <!--Copyright-->
         <div class="footer-copyright py-3">
-        © 2019 Copyright:
-        <a href="https://mdbootstrap.com/education/bootstrap/" target="_blank"> MDBootstrap.com </a>
+        © 2021 Copyright:
+        <a href="https://mdbootstrap.com/education/bootstrap/" target="_blank"> COMESupermarket </a>
         </div>
         <!--/.Copyright-->
 

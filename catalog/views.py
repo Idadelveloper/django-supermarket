@@ -5,6 +5,11 @@ from django.views.generic import ListView, DetailView, View
 from .models import Item, OrderItem, Order, Address
 from .forms import AddressForm
 
+import stripe
+
+
+stripe.api_key = "sk_test_51J3WbnCUmH6EvAChkr4kK5eYN6s71OugkyToTSmTqQe8licaMwAKfM1SRspia9XayZzwRmCpBbCSzGK83a0wWs0I00IzopbFek"
+
 # Create your views here.
 
 class HomeView(ListView):
@@ -72,6 +77,28 @@ class CheckoutView(View):
         else:
             print('form invalid')
             return redirect('checkout')
+
+
+class PaymentView(View):
+    def get(self, *args, **kwargs):
+        return render(self.request, 'payment.html')
+
+    def post(self, *args, **kwargs):
+        order = Order.objects.get(user=self.request.user, ordered=False)
+        costumer = stripe.Customer.create(
+            email = self.request.user.email,
+            description=self.request.user.username,
+            source=self.request.POST['stripeToken']
+        )
+        amount = order.get_total()
+        charge = stripe.Charge.create(
+            amount=amount,
+            currency="xaf",
+            customer=costumer,
+            description="Test payment for buteks online",
+        )
+        messages.success(self.request, "Payment was successful")
+        return redirect('home')
     
 
 def add_to_cart(request, slug):

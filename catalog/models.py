@@ -5,9 +5,11 @@ from django_countries.fields import CountryField
 
 
 CATEGORY_CHOICES = (
-    ('S', 'Shirt'),
-    ('SW', 'SportWear'),
-    ('OW', 'OutWear')
+    ('F', 'Food'),
+    ('C', 'Clothes'),
+    ('S', 'Shoes'),
+    ('B', 'Books')
+    
 )
 LABEL_CHOICES = (
     ('S', 'secondary'),
